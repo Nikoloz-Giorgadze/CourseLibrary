@@ -22,7 +22,7 @@ namespace CourseLibrary.Entities
         [Required]
         [MaxLength(50)]
         public string MainCategory { get; set; }
-
+        public string Test { get; set; }
         public ICollection<Course> Courses { get; set; } = new List<Course>();
     }
 }

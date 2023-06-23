@@ -1,4 +1,5 @@
 ﻿using CourseLibrary.Entities;
+using CourseLibrary.ResourceParameters;
 using CourseLibraryDbContext;
 using System.Data.Entity;
 
@@ -77,22 +78,25 @@ namespace CourseLibrary.Services
             return await _context.Authors.FirstOrDefaultAsync(x => x.Id == authorId);
         }
 
-        public async Task<IEnumerable<Author>> GetAuthorsAsync(string? mainCategory, string? searchQuery)
+        public async Task<IEnumerable<Author>> GetAuthorsAsync(AuthorsResourceParameters authorsResourceParameters)
         {
-            if (string.IsNullOrEmpty(mainCategory) && string.IsNullOrEmpty(searchQuery))
+            if (authorsResourceParameters is null)
+                throw new ArgumentNullException(nameof(authorsResourceParameters));
+
+            if (string.IsNullOrWhiteSpace(authorsResourceParameters.MainCategory) && string.IsNullOrWhiteSpace(authorsResourceParameters.SearchQuery))
                 return await GetAuthorsAsync();
 
             var collection = _context.Authors as IQueryable<Author>;
 
-            if (!string.IsNullOrEmpty(mainCategory))
+            if (!string.IsNullOrEmpty(authorsResourceParameters.MainCategory))
             {
-                mainCategory = mainCategory.Trim();
+                var mainCategory = authorsResourceParameters.MainCategory.Trim();
                 collection = collection.Where(x => x.MainCategory == mainCategory);
             }
 
-            if (!string.IsNullOrEmpty(searchQuery))
+            if (!string.IsNullOrEmpty(authorsResourceParameters.SearchQuery))
             {
-                searchQuery = searchQuery.Trim();
+                var searchQuery = authorsResourceParameters.SearchQuery.Trim();
                 collection = collection.Where(x => x.MainCategory.Contains(searchQuery)
                 || x.FirstName.Contains(searchQuery)
                 || x.LastName.Contains(searchQuery));
