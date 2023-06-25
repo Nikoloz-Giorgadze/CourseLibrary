@@ -83,7 +83,8 @@ namespace CourseLibrary.Services
             if (authorsResourceParameters is null)
                 throw new ArgumentNullException(nameof(authorsResourceParameters));
 
-            if (string.IsNullOrWhiteSpace(authorsResourceParameters.MainCategory) && string.IsNullOrWhiteSpace(authorsResourceParameters.SearchQuery))
+            if (string.IsNullOrWhiteSpace(authorsResourceParameters.MainCategory) && string
+                .IsNullOrWhiteSpace(authorsResourceParameters.SearchQuery))
                 return await GetAuthorsAsync();
 
             var collection = _context.Authors as IQueryable<Author>;
@@ -102,7 +103,9 @@ namespace CourseLibrary.Services
                 || x.LastName.Contains(searchQuery));
             }
 
-            return await collection.ToListAsync();
+            return await collection.Skip(authorsResourceParameters.PageSize * (authorsResourceParameters.PageNumber - 1))
+                .Take(authorsResourceParameters.PageSize)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Author>> GetAuthorsAsync()
